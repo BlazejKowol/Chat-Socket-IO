@@ -1,3 +1,5 @@
+const socket = io();
+
 const loginForm = document.querySelector('#welcome-form');
 const messagesSection = document.querySelector('#messages-section');
 const messagesList = document.querySelector('#messages-list');
@@ -13,6 +15,7 @@ loginForm.addEventListener('submit', function login(e) {
         userName = userNameInput.value;
         loginForm.classList.remove('show');
         messagesSection.classList.add('show');
+        socket.emit('newUser', { author: userName })
     } else {
       alert('You need to fill in the form!');
     }
@@ -22,6 +25,7 @@ addMessageForm.addEventListener('submit', function sendMessage(e) {
     e.preventDefault();
     if(messageContentInput.value.length > 0) {
         addMessage(userName, messageContentInput.value);
+        socket.emit('message', { author: userName, content: messageContentInput.value })
         messageContentInput.value = '';
     } else {
         alert('You need to type something');
@@ -42,3 +46,5 @@ const addMessage = (author, content) => {
         </div>`;
     messagesList.appendChild(message);
 };
+
+socket.on('message', ({ author, content }) => addMessage(author, content))
